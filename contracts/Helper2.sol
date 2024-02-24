@@ -14,9 +14,9 @@ contract Helper {
   IUniswapV2Router02 public router;
   IUniswapV2Factory public factory;
 
-  constructor() {
-    router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    factory = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+  constructor(address _router, address _factory) {
+    router = IUniswapV2Router02(_router); // 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+    factory = IUniswapV2Factory(_factory); // 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
   }
 
   // 토큰 A와 토큰 B의 pair 조회
@@ -53,7 +53,7 @@ contract Helper {
   }
 
   // 단일 토큰으로 유동성 추가
-  function singleTokenAddLiquidity(IUniswapV2Pair pair, address tokenA, uint256 singleAmount, address to, uint256 deadline) external {
+  function singleTokenAddLiquidity1(IUniswapV2Pair pair, address tokenA, uint256 singleAmount, address to, uint256 deadline) external {
     IERC20(tokenA).transferFrom(msg.sender, address(this), singleAmount);
 
     // 토큰 B 주소 얻기
@@ -92,7 +92,7 @@ contract Helper {
     }
   }
 
-  function AddLiquidity(IUniswapV2Pair _pair, address _token, uint256 _amount, address _to, uint256 _deadline) external {
+  function singleTokenAddLiquidity2(IUniswapV2Pair _pair, address _token, uint256 _amount, address _to, uint256 _deadline) external {
     require(_deadline >= block.timestamp, "deadline can't less than current time");
     require(_amount > 0, "amounts can't less than 0");
     if (_amount > 0) _receiveToken(_token, _amount);
@@ -100,6 +100,8 @@ contract Helper {
     address _otherToken = _pair.token1() == _token ? _pair.token0() : _pair.token1();
 
     _swapAndAddLiquidity(_token, _otherToken, _amount, _to);
+
+    _returnLPToken(_pair, _to);
 
     _returnRemaingTokens(_token, _otherToken);
   }
@@ -139,6 +141,12 @@ contract Helper {
     uint256 allowance = IERC20(_token).allowance(address(this), address(router));
 
     if (allowance < _amount) IERC20(_token).safeIncreaseAllowance(address(router), 2 ** 256 - 1 - allowance);
+  }
+
+  function _returnLPToken(IUniswapV2Pair _pair, address _to) internal {
+    address lpTokenAddress = address(_pair);
+    uint256 lpTokenBalance = IERC20(lpTokenAddress).balanceOf(address(this));
+    IERC20(lpTokenAddress).safeTransfer(_to, lpTokenBalance);
   }
 
   function _returnRemaingTokens(address _tokenA, address _tokenB) internal {
