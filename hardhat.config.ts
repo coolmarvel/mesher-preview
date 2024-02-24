@@ -12,12 +12,9 @@ const config: HardhatUserConfig = {
       },
       blockGasLimit: 30000000,
     },
-    goerli: {
-      url: "https://goerli.blockpi.network/v1/rpc/public",
-      chainId: 5,
+    sepolia: {
+      url: "https://rpc.sepolia.org",
       accounts: require("./goerli.json").privateKey,
-      gas: 30000000,
-      gasPrice: 250000000000,
     },
   },
 };
