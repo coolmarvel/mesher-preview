@@ -1,13 +1,38 @@
-# Sample Hardhat Project
+# 프로젝트 개요
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+이 프로젝트는 Uniswap V2 프로토콜을 사용하여 특정 토큰의 유동성을 관리하는 스마트 컨트랙트의 개발을 목표로 합니다.  
+개발 기간은 2024년 2월 24일 오전 10시부터 2월 26일 오전 10시까지로 설정했습니다.
 
-Try running some of the following tasks:
+## 요구사항 분석 및 기술 학습 (오전 10시 ~ 오후 10시)
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+### 요구사항 분석
+
+Uniswap V2 플랫폼을 이해하고, 스마트 컨트랙트를 통해 토큰의 유동성 관리 기능을 구현하는 것이 주요 목표입니다.  
+MAT와 MBT 토큰 간의 유동성 풀을 생성하고 관리하는 기능이 필요합니다.
+
+### 기술 학습
+
+Uniswap V2의 핵심 개념과 메커니즘에 대한 학습이 필요했습니다.  
+이를 통해 유동성 풀, 라우터, 팩토리 등의 개념을 이해하고, 이들이 어떻게 상호 작용하는지 파악했습니다.  
+Solidity와 스마트 컨트랙트 개발에 필요한 다양한 도구와 라이브러리에 대한 학습도 진행했습니다.
+
+#### 필요 기술 스택
+
+- 팩토리(Factory): 모든 풀과 각 풀에 대한 정보를 생성하고 관리하는 컨트랙트입니다.
+- 라우터(Router): 토큰 교환, 유동성 추가 및 제거 등의 기능을 제공하는 컨트랙트입니다.
+- 페어(Pair): 두 토큰 간의 유동성 풀을 나타내며, 이를 통해 토큰 교환 비율이 결정됩니다.
+
+Uniswap V2에서는 풀을 통해 토큰을 교환하고, 유동성을 제공하여 LP 토큰을 받게 됩니다.  
+이러한 LP 토큰은 풀에 대한 사용자의 기여도를 나타내며, 유동성 제공자는 수수료 수익을 얻을 수 있습니다.
+
+## 설계 및 기획 (오후 8시 ~ )
+
+전체 프로젝트의 구조를 설계하고 각 기능별 구현 방법에 대해 기획했습니다.  
+이 과정에서 스마트 컨트랙트의 기능, 인터페이스, 그리고 사용자와의 상호작용 방식을 고려했습니다.
+
+- MAT, MBT ERC20 토큰 컨트랙트를 활용해 페어를 생성해 유동성 관리
+- Helper 컨트랙트를 활용해 유동성 예치 및 LP 토큰 수령
+
+1. 유니스왑 V2의 개념 이해
+2. 스마트 컨트랙트 설계 및 개발
+3. 테스트 및 디버깅
