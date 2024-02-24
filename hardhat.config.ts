@@ -3,7 +3,23 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   solidity: { compilers: [{ version: "0.8.24" }], overrides: {} },
-  networks: {},
+  networks: {
+    hardhat: {
+      forking: { url: "https://eth-mainnet.public.blastapi.io", blockNumber: 19000000 },
+      accounts: {
+        mnemonic: "test test test test test test test test test test test junk",
+        accountsBalance: "10000000000000000000000000",
+      },
+      blockGasLimit: 30000000,
+    },
+    goerli: {
+      url: "https://goerli.blockpi.network/v1/rpc/public",
+      chainId: 5,
+      accounts: require("./goerli.json").privateKey,
+      gas: 30000000,
+      gasPrice: 250000000000,
+    },
+  },
 };
 
 export default config;
