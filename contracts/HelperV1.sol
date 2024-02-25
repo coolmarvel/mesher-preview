@@ -124,11 +124,11 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
     uint256 remainingTokenB = IERC20Upgradeable(_tokenB).balanceOf(address(this));
 
     if (remainingTokenA > 0) {
-      IERC20Upgradeable(_tokenA).transfer(msg.sender, remainingTokenA);
+      IERC20Upgradeable(_tokenA).safeTransfer(msg.sender, remainingTokenA);
     }
 
     if (remainingTokenB > 0) {
-      IERC20Upgradeable(_tokenB).transfer(msg.sender, remainingTokenB);
+      IERC20Upgradeable(_tokenB).safeTransfer(msg.sender, remainingTokenB);
     }
   }
 }
