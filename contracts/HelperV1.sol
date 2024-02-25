@@ -16,25 +16,25 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
   IUniswapV2Router02 public router;
   IUniswapV2Factory public factory;
 
-  function initialize(address _router, address _factory) public initializer {
+  function initialize(address _router, address _factory) external initializer {
     router = IUniswapV2Router02(_router);
     factory = IUniswapV2Factory(_factory);
 
     __ReentrancyGuard_init();
   }
 
-  function getPair(address _tokenA, address _tokenB) public view returns (address) {
+  function getPair(address _tokenA, address _tokenB) external view returns (address) {
     return factory.getPair(_tokenA, _tokenB);
   }
 
-  function createPair(address _tokenA, address _tokenB) public returns (address) {
+  function createPair(address _tokenA, address _tokenB) external returns (address) {
     address pair = this.getPair(_tokenA, _tokenB);
     require(pair == address(0), "Already exist pair");
 
     return factory.createPair(_tokenA, _tokenB);
   }
 
-  function getTokenReserves(address _tokenA, address _tokenB) public view returns (uint256, uint256) {
+  function getTokenReserves(address _tokenA, address _tokenB) external view returns (uint256, uint256) {
     address pairAddress = this.getPair(_tokenA, _tokenB);
     if (pairAddress == address(0)) return (0, 0);
 
