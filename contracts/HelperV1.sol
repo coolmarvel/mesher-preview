@@ -51,7 +51,7 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
     _approveTokenToRouter(_tokenA, _amountA);
     _approveTokenToRouter(_tokenB, _amountB);
 
-    router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, msg.sender, 2 ** 256 - 1);
+    router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, msg.sender, block.timestamp + 30 minutes);
   }
 
   function searchLPTokenBalance(address _tokenA, address _tokenB, address _address) public view returns (uint256) {
@@ -85,7 +85,7 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
     _approveTokenToRouter(_tokenA, _amountA);
     _approveTokenToRouter(_tokenB, _amountB);
 
-    router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, _to, 2 ** 256 - 1);
+    router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, _to, block.timestamp + 30 minutes);
   }
 
   function _swapToSyncRatio(address _tokenA, address _tokenB, uint256 _amount) internal returns (uint256, uint256) {
@@ -99,7 +99,7 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
     path[0] = _tokenA;
     path[1] = _tokenB;
 
-    router.swapExactTokensForTokens(_amountToSwap, 0, path, address(this), 2 ** 256 - 1);
+    router.swapExactTokensForTokens(_amountToSwap, 0, path, address(this), block.timestamp + 30 minutes);
 
     uint256 _amountA = _amount - _amountToSwap;
     uint256 _amountB = IERC20Upgradeable(_tokenB).balanceOf(address(this));
@@ -110,7 +110,7 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
   function _approveTokenToRouter(address _token, uint256 _amount) internal {
     uint256 allowance = IERC20Upgradeable(_token).allowance(address(this), address(router));
 
-    if (allowance < _amount) IERC20Upgradeable(_token).safeIncreaseAllowance(address(router), 2 ** 256 - 1 - allowance);
+    if (allowance < _amount) IERC20Upgradeable(_token).safeIncreaseAllowance(address(router), _amount);
   }
 
   function _returnLPToken(IUniswapV2Pair _pair, address _to) internal {

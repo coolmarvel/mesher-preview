@@ -60,6 +60,12 @@ Uniswap V2에서는 풀을 통해 토큰을 교환하고, 유동성을 제공하
   이 과정에서 토큰이 또 다른 토큰으로 스왑되어 유동성 풀에 추가됩니다.
 - `searchLpTokenBalance`: 특정 주소의 LP 토큰 잔액을 조회합니다.
 
+```bash
+$ npm install
+$ npx hardhat compile
+$ npx hardhat test test/HelperV1.ts
+```
+
 ## 작업물에 대한 회고
 
 이번 프로젝트를 통해 부족함을 많이 느끼면서, 한편으로는 uniswap v2 프로토콜을 활용하면서 컨트랙트 개발에 대해 더 지식을 넓힐 수 있어서 좋았습니다.
