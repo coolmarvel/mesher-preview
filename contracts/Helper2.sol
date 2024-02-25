@@ -27,7 +27,7 @@ contract Helper {
   // 토큰 A와 토큰 B의 pair 생성 (이미 있으면 생성 x)
   function createPair(address _tokenA, address _tokenB) public returns (address) {
     address pair = this.getPair(_tokenA, _tokenB);
-    require(pair != address(0), "Already exist pair");
+    require(pair == address(0), "Already exist pair");
 
     return factory.createPair(_tokenA, _tokenB);
   }
@@ -52,47 +52,7 @@ contract Helper {
     return pair.totalSupply();
   }
 
-  // 단일 토큰으로 유동성 추가
-  function singleTokenAddLiquidity1(IUniswapV2Pair pair, address tokenA, uint256 singleAmount, address to, uint256 deadline) external {
-    IERC20(tokenA).transferFrom(msg.sender, address(this), singleAmount);
-
-    // 토큰 B 주소 얻기
-    address tokenB = pair.token1() == tokenA ? pair.token0() : pair.token1();
-
-    // 토큰 A의 절반을 토큰 B로 스왑
-    uint256 swapAmount = singleAmount / 2;
-    IERC20(tokenA).approve(address(router), swapAmount);
-    address[] memory path = new address[](2);
-    path[0] = tokenA;
-    path[1] = tokenB;
-    router.swapExactTokensForTokens(swapAmount, 0, path, address(this), deadline);
-
-    // 스왑 후 토큰 B 잔액 확인
-    uint256 tokenBBalance = IERC20(tokenB).balanceOf(address(this));
-
-    // 유동성 추가
-    IERC20(tokenB).approve(address(router), tokenBBalance);
-    router.addLiquidity(tokenA, tokenB, singleAmount - swapAmount, tokenBBalance, 0, 0, to, deadline);
-
-    // LP 토큰을 사용자에게 전송
-    address lpTokenAddress = address(pair); // 타입 캐스팅
-    uint256 lpTokenBalance = IERC20(lpTokenAddress).balanceOf(address(this));
-    IERC20(lpTokenAddress).transfer(to, lpTokenBalance);
-
-    // 잔여 토큰 반환
-    uint256 remainingTokenA = IERC20(tokenA).balanceOf(address(this));
-    uint256 remainingTokenB = IERC20(tokenB).balanceOf(address(this));
-
-    if (remainingTokenA > 0) {
-      IERC20(tokenA).transfer(msg.sender, remainingTokenA);
-    }
-
-    if (remainingTokenB > 0) {
-      IERC20(tokenB).transfer(msg.sender, remainingTokenB);
-    }
-  }
-
-  function singleTokenAddLiquidity2(IUniswapV2Pair _pair, address _token, uint256 _amount, address _to, uint256 _deadline) external {
+  function singleTokenAddLiquidity(IUniswapV2Pair _pair, address _token, uint256 _amount, address _to, uint256 _deadline) external {
     require(_deadline >= block.timestamp, "deadline can't less than current time");
     require(_amount > 0, "amounts can't less than 0");
     if (_amount > 0) _receiveToken(_token, _amount);
@@ -161,4 +121,64 @@ contract Helper {
       IERC20(_tokenB).transfer(msg.sender, remainingTokenB);
     }
   }
+
+  function initiatePoolReserves(address _tokenA, address _tokenB, uint _amountA, uint _amountB) public {
+    (uint256 _reserveA, uint256 _reserveB) = this.getTokenReserves(_tokenA, _tokenB);
+    require(_reserveA == 0 && _reserveB == 0, "There is remaining reserves");
+
+    _approveTokenToRouter(_tokenA, _amountA);
+    _approveTokenToRouter(_tokenB, _amountB);
+
+    IERC20(_tokenA).safeTransferFrom(msg.sender, address(this), _amountA);
+    IERC20(_tokenB).safeTransferFrom(msg.sender, address(this), _amountB);
+
+    router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, msg.sender, 2 ** 256 - 1);
+  }
+
+  function searchLPTokenBalance(IUniswapV2Pair _pair, address _address) public view returns (uint256) {
+    address lpTokenAddress = address(_pair);
+    uint256 lpTokenBalance = IERC20(lpTokenAddress).balanceOf(_address);
+
+    return lpTokenBalance;
+  }
 }
+
+// // 단일 토큰으로 유동성 추가
+// function singleTokenAddLiquidity1(IUniswapV2Pair pair, address tokenA, uint256 singleAmount, address to, uint256 deadline) external {
+//   IERC20(tokenA).transferFrom(msg.sender, address(this), singleAmount);
+
+//   // 토큰 B 주소 얻기
+//   address tokenB = pair.token1() == tokenA ? pair.token0() : pair.token1();
+
+//   // 토큰 A의 절반을 토큰 B로 스왑
+//   uint256 swapAmount = singleAmount / 2;
+//   IERC20(tokenA).approve(address(router), swapAmount);
+//   address[] memory path = new address[](2);
+//   path[0] = tokenA;
+//   path[1] = tokenB;
+//   router.swapExactTokensForTokens(swapAmount, 0, path, address(this), deadline);
+
+//   // 스왑 후 토큰 B 잔액 확인
+//   uint256 tokenBBalance = IERC20(tokenB).balanceOf(address(this));
+
+//   // 유동성 추가
+//   IERC20(tokenB).approve(address(router), tokenBBalance);
+//   router.addLiquidity(tokenA, tokenB, singleAmount - swapAmount, tokenBBalance, 0, 0, to, deadline);
+
+//   // LP 토큰을 사용자에게 전송
+//   address lpTokenAddress = address(pair); // 타입 캐스팅
+//   uint256 lpTokenBalance = IERC20(lpTokenAddress).balanceOf(address(this));
+//   IERC20(lpTokenAddress).transfer(to, lpTokenBalance);
+
+//   // 잔여 토큰 반환
+//   uint256 remainingTokenA = IERC20(tokenA).balanceOf(address(this));
+//   uint256 remainingTokenB = IERC20(tokenB).balanceOf(address(this));
+
+//   if (remainingTokenA > 0) {
+//     IERC20(tokenA).transfer(msg.sender, remainingTokenA);
+//   }
+
+//   if (remainingTokenB > 0) {
+//     IERC20(tokenB).transfer(msg.sender, remainingTokenB);
+//   }
+// }
