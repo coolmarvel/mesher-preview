@@ -54,11 +54,11 @@ contract HelperV1 is Initializable, ReentrancyGuardUpgradeable {
     router.addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, msg.sender, 2 ** 256 - 1);
   }
 
-  function searchLPTokenBalance(address _tokenA, address _tokenB) public view returns (uint256) {
+  function searchLPTokenBalance(address _tokenA, address _tokenB, address _address) public view returns (uint256) {
     address pairAddress = factory.getPair(_tokenA, _tokenB);
     require(pairAddress != address(0), "Pair does not exist");
 
-    return IERC20Upgradeable(pairAddress).balanceOf(msg.sender);
+    return IERC20Upgradeable(pairAddress).balanceOf(_address);
   }
 
   function singleTokenAddLiquidity(IUniswapV2Pair _pair, address _token, uint256 _amount, address _to, uint256 _deadline) external {
